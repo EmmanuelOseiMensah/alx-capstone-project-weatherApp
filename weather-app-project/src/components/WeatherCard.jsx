@@ -9,7 +9,7 @@ function WeatherCard({weather}) {
       
       <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
 
-            <div className="bg-blue-50 round-lg p-3">
+            <div className="bg-blue-50 rounded-lg p-3">
                  <p className="text-gray-500">💧 Humidity</p>
                  <p className="font-semibold">{weather.main.humidity}</p>
             </div>
