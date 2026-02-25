@@ -10,12 +10,11 @@ function SearchBar({ city, setCity, onSearch }) {
         focus:ring-blue-400"
       />
       <button
-        onClick={onSearch}
-        className="px-5 py-2 bg-blue-500 text-white rounded-xl hover:bg-600
-        transition font-medium"
+  onClick={onSearch}
+  className="px-5 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition font-medium"
       >
-        Search
-      </button>
+  Search
+  </button>
     </div>
   );
 }

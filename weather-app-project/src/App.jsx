@@ -31,12 +31,13 @@ function App() {
       const forecast_response = await fetch(forecast_url);
       if (!forecast_response.ok) throw new Error("Failed to fetch forecast data");
       const forecast_data = await forecast_response.json();
+      console.log(forecast_data);
 
       // Filter forecast data to get only midday entries for the next 5 days
       const midday_forecast = forecast_data.list.filter(item => {
         const date = new Date(item.dt * 1000);
         return date.getHours() === 12; // Get entries for 12:00 PM
-      }).slice(0, 5); // Get only the next 5 days
+      }).slice(0, 5); // Get forecast for the next 5 days
 
       setForecast(midday_forecast);
 
