@@ -6,7 +6,7 @@ const FiveDaysForecast = ({ forecast }) => {
       <h2 className="text-xl font-bold mb-4">5-Day Forecast</h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        {forecast.map((item, index) => {
+        {forecast.map((item) => {
           const date = new Date(item.dt * 1000).toLocaleDateString("en-GH", {
             weekday: "short",
             day: "numeric",

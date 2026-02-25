@@ -3,6 +3,7 @@ import  ErrorMessage from './components/ErrorMessage';
 import SearchBar from "./components/SearchBar";
 import WeatherCard from "./components/WeatherCard";
 import FiveDaysForecast from "./components/FiveDaysForecast"
+import DynamicBackground from './components/DynamicBackground';
 
 function App() {
    const[city, setCity] = useState("");
@@ -54,20 +55,24 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-400 to-blue-600 flex items-center
-    justify-center px-4">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-            <h1 className="text-3xl font-bold">Weather Dashboard</h1>
+  <DynamicBackground weather={weather}>
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+      <h1 className="text-3xl font-bold">Weather Dashboard</h1>
 
-            <SearchBar city={city} setCity={setCity} onSearch={fetchWeatherData} />
-            {loading && <p className="text-center text-gray-500 mt-4">Fetching weather ...</p>}
-            <ErrorMessage message={error} />
-            <WeatherCard weather={weather} />
-            <FiveDaysForecast forecast={forecast} />
+      <SearchBar city={city} setCity={setCity} onSearch={fetchWeatherData} />
 
-        </div>
+      {loading && (
+        <p className="text-center text-gray-500 mt-4">
+          Fetching weather ...
+        </p>
+      )}
+
+      <ErrorMessage message={error} />
+      <WeatherCard weather={weather} />
+      <FiveDaysForecast forecast={forecast} />
     </div>
-  );
+  </DynamicBackground>
+);
 }
 
 export default App;
