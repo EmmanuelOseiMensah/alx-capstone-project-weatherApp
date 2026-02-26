@@ -1,9 +1,9 @@
-const FiveDaysForecast = ({ forecast }) => {
+const FiveDaysForecast = ({ forecast, cityName }) => {
   if (!forecast || forecast.length === 0) return null;
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-bold mb-4 text-gray-800">5-Day Forecast</h2>
+      <h2 className="text-xl font-bold mb-4 text-gray-800">5-Day Forecast of {cityName} </h2>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {forecast.map((item) => {
           const { dt, main, weather } = item;

@@ -17,7 +17,7 @@ function SearchBar({ city, setCity, onSearch }) {
         type="submit"
         className="px-5 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition font-medium active:scale-95"
       >
-        Search
+        Get updates
       </button>
     </form>
   );

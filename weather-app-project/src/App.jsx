@@ -59,7 +59,7 @@ function App() {
             className="w-12 h-12 mr-3"
           />
           <h1 className="text-2xl font-extrabold text-gray-800 tracking-tight">
-            Weather Dash
+            Weather Dashboard
           </h1>
         </header>
 
@@ -78,7 +78,9 @@ function App() {
           <>
             <ErrorMessage message={error} />
             <WeatherCard weather={weather} />
-            <FiveDaysForecast forecast={forecast} />
+            <FiveDaysForecast 
+            forecast={forecast} 
+             cityName={weather?.name || "Unknown City"}/>
           </>
         )}
       </div>
