@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 
-const REFRESH_INTERVAL = 5 * 60 * 1000; // Increased to 5 mins (standard for weather)
+const REFRESH_INTERVAL = 2 * 60 * 1000; // Increase to 5  mins later (standard for weather)
 
 export default function useWeather(city) {
   const [weather, setWeather] = useState(null);
