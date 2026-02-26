@@ -1,10 +1,10 @@
-function ErrorMessage({message}) {
-    if(!message) return null; //Don't give error message if there are no erros
+function ErrorMessage({ message }) {
+  if (!message) return null;
 
-    return(
-        <p className="text-center text-red-500 mt-4">{message}</p>
-
-    );
-    
-} 
-export default ErrorMessage; 
+  return (
+    <div role="alert" className="bg-red-50 border-l-4 border-red-500 p-4 mt-4">
+      <p className="text-center text-red-700 font-medium">{message}</p>
+    </div>
+  );
+}
+export default ErrorMessage;

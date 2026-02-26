@@ -3,41 +3,23 @@ const FiveDaysForecast = ({ forecast }) => {
 
   return (
     <div className="mt-8">
-      <h2 className="text-xl font-bold mb-4">5-Day Forecast</h2>
-
+      <h2 className="text-xl font-bold mb-4 text-gray-800">5-Day Forecast</h2>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {forecast.map((item) => {
-          const date = new Date(item.dt * 1000).toLocaleDateString("en-GH", {
+          const { dt, main, weather } = item;
+          const date = new Date(dt * 1000).toLocaleDateString("en-GH", {
             weekday: "short",
             day: "numeric",
           });
 
-          const iconCode = item.weather[0].icon;
-          const description = item.weather[0].description;
-          const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+          const iconUrl = `https://openweathermap.org/img/wn/${weather[0].icon}@2x.png`;
 
           return (
-            <div
-              key={item.dt}
-              className="bg-gray-50 p-3 rounded-xl text-center border"
-            >
-              <p className="text-xs font-semibold text-gray-500 uppercase">
-                {date}
-              </p>
-
-              <img
-                src={iconUrl}
-                alt={description}
-                className="w-12 h-12 mx-auto"
-              />
-
-              <p className="text-lg font-bold">
-                {Math.round(item.main.temp)}°C
-              </p>
-
-              <p className="text-[10px] text-gray-400 capitalize">
-                {description}
-              </p>
+            <div key={dt} className="bg-white p-3 rounded-xl text-center border shadow-sm hover:shadow-md transition">
+              <p className="text-xs font-semibold text-gray-500 uppercase">{date}</p>
+              <img src={iconUrl} alt={weather[0].description} className="w-12 h-12 mx-auto" />
+              <p className="text-lg font-bold text-gray-800">{Math.round(main.temp)}°C</p>
+              <p className="text-[10px] text-gray-400 capitalize">{weather[0].description}</p>
             </div>
           );
         })}
@@ -45,5 +27,4 @@ const FiveDaysForecast = ({ forecast }) => {
     </div>
   );
 };
-
 export default FiveDaysForecast;

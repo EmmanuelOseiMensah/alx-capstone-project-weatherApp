@@ -1,78 +1,89 @@
-import {useState} from 'react';
-import  ErrorMessage from './components/ErrorMessage';
+import { useState, useCallback } from "react";
+import ErrorMessage from "./components/ErrorMessage";
 import SearchBar from "./components/SearchBar";
 import WeatherCard from "./components/WeatherCard";
-import FiveDaysForecast from "./components/FiveDaysForecast"
-import DynamicBackground from './components/DynamicBackground';
+import FiveDaysForecast from "./components/FiveDaysForecast";
+import DynamicBackground from "./components/DynamicBackground";
+import useWeather from "./hooks/useWeather";
+import Weatherlogo from "./assets/weather-icon.webp";
 
 function App() {
-   const[city, setCity] = useState("");
-   const [weather, setWeather] =useState(null);
-   const [loading, setLoading] = useState(false);
-   const [error, setError] = useState("");
-
-   // Added a state for forecast
+  const [city, setCity] = useState("");
   const [forecast, setForecast] = useState([]);
+  const [isForecastLoading, setIsForecastLoading] = useState(false);
 
-   const fetchWeatherData = async ( ) => {
-    if(!city) {
-      setError("Please enter a city name");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    setWeather(null);
-    
+  // Use our custom hook for current weather
+  const { weather, loading, error, refresh } = useWeather(city);
+
+  const fetchForecast = useCallback(async (searchCity) => {
+    if (!searchCity) return;
+
     try {
+      setIsForecastLoading(true);
       const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
-      const forecast_url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`;
+      const forecast_url = `https://api.openweathermap.org/data/2.5/forecast?q=${searchCity}&appid=${API_KEY}&units=metric`;
 
+      const res = await fetch(forecast_url);
+      if (!res.ok) throw new Error("Forecast data unavailable");
 
-      const forecast_response = await fetch(forecast_url);
-      if (!forecast_response.ok) throw new Error("Failed to fetch forecast data");
-      const forecast_data = await forecast_response.json();
-      console.log(forecast_data);
+      const data = await res.json();
 
-      // Filter forecast data to get only midday entries for the next 5 days
-      const midday_forecast = forecast_data.list.filter(item => {
-        const date = new Date(item.dt * 1000);
-        return date.getHours() === 12; // Get entries for 12:00 PM
-      }).slice(0, 5); // Get forecast for the next 5 days
+      // Logic check: Filter for midday (12:00) to get one reading per day
+      const midday_forecast = data.list
+        .filter((item) => item.dt_txt.includes("12:00:00"))
+        .slice(0, 5);
 
       setForecast(midday_forecast);
-
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("City not found");
-
-      const data = await response.json();
-      setWeather(data);
     } catch (err) {
-      setError(err.message);
+      console.error("Forecast Error:", err.message);
+      setForecast([]); // Clear forecast on error
     } finally {
-      setLoading(false)
+      setIsForecastLoading(false);
     }
+  }, []);
+
+  // Wrapper function to trigger both fetches at once
+  const handleSearch = () => {
+    if (!city.trim()) return;
+    refresh(); // From useWeather hook
+    fetchForecast(city);
   };
 
   return (
-  <DynamicBackground weather={weather}>
-    <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-      <h1 className="text-3xl font-bold">Weather Dashboard</h1>
+    <DynamicBackground weather={weather}>
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 m-4">
+        <header className="flex items-center justify-center mb-6">
+          <img
+            src={Weatherlogo}
+            alt="weather-logo"
+            className="w-12 h-12 mr-3"
+          />
+          <h1 className="text-2xl font-extrabold text-gray-800 tracking-tight">
+            Weather Dash
+          </h1>
+        </header>
 
-      <SearchBar city={city} setCity={setCity} onSearch={fetchWeatherData} />
+        <SearchBar city={city} setCity={setCity} onSearch={handleSearch} />
 
-      {loading && (
-        <p className="text-center text-gray-500 mt-4">
-          Fetching weather ...
-        </p>
-      )}
+        {/* Loading Indicator */}
+        {(loading || isForecastLoading) && (
+          <div className="flex justify-center items-center mt-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p className="ml-3 text-sm text-gray-500">Updating weather...</p>
+          </div>
+        )}
 
-      <ErrorMessage message={error} />
-      <WeatherCard weather={weather} />
-      <FiveDaysForecast forecast={forecast} />
-    </div>
-  </DynamicBackground>
-);
+        {/* Conditional Rendering */}
+        {!loading && (
+          <>
+            <ErrorMessage message={error} />
+            <WeatherCard weather={weather} />
+            <FiveDaysForecast forecast={forecast} />
+          </>
+        )}
+      </div>
+    </DynamicBackground>
+  );
 }
 
 export default App;
