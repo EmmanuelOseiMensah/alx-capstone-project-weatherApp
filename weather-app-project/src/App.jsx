@@ -44,7 +44,7 @@ function App() {
             <div className="flex flex-col justify-center items-center py-24">
               <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
               <p className="mt-4 font-bold text-gray-400 animate-pulse uppercase tracking-widest text-xs">
-                Syncing Forecast...
+                Fetching Updates...
               </p>
             </div>
           ) : error ? (
