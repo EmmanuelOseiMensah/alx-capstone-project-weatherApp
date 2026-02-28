@@ -4,7 +4,7 @@ A modern, responsive Weather Dashboard built with **React JS** and **Tailwind CS
 
 ## 🚀 Live Demo
 
-**[Insert Netlify/Vercel App Link Here Later After Completing the Project ]**
+**https://skycast-weatherdashboard.netlify.app/**
 
 ----------------------------------------------------------
 
@@ -16,9 +16,9 @@ This project simulates a real-world frontend development environment. The goal w
 
 * **Real-Time Data:** Fetches current temperature, humidity, and wind speed using the OpenWeatherMap API.
 * **Dynamic Search:** Search by city name with instant UI updates and error handling for invalid entries.
-* **Auto-Refresh:** Logic implemented to automatically poll the API every few minutes to ensure data accuracy.
+* **Auto-Refresh:** Logic implemented to automatically poll the API every two minutes to ensure data accuracy.
 * **Responsive Design:** Fully optimized for Mobile, Tablet, and Desktop views using Tailwind CSS.
-* **Weather Visuals:** Dynamic weather icons that change based on current conditions (Sunny, Cloudy, Rainy, etc.).
+* **Weather Visuals:** Dynamic weather icons and background color that change based on current conditions (Sunny, Cloudy, Rainy, etc.).
 
 --------------------------------------------------------
 
@@ -27,8 +27,9 @@ This project simulates a real-world frontend development environment. The goal w
 * **Frontend:** React.js (Vite)
 * **Styling:** Tailwind CSS
 * **State Management:** React Hooks (`useState`, `useEffect`)
-* **Data Fetching:** Axios / Fetch API
-* **Deployment:** Netlify / Vercel
+* **Custom Hook:** useWeather.js
+* **Data Fetching:**  Fetch API
+* **Deployment:** Netlify 
 
 ------------------------------------------------------
 
@@ -38,7 +39,8 @@ The application is built using a modular component-based architecture:
 
 * **`SearchBar.jsx`**: Handles user input and submission logic.
 * **`WeatherCard.jsx`**: A reusable component for displaying primary weather metrics.
-* **`ErrorMessage.jsx`**: Gracefully handles 404s (city not found) and network errors.
+* **`ErrorMessage.jsx`**: Gracefully handles 404s (location not found or data unavailable) and network error.
+* **`FiveDaysForecast.jsx`**Display 5-day weather forecast of searched city with corresponding icons and descriptions*.
 
 ### Data Flow
 
@@ -68,7 +70,7 @@ npm install
 3. **Set up Environment Variables:**
 Create a `.env` file in the root directory and add your API key:
 ```env
-VITE_WEATHER_API_KEY=later_enter_openweathermap_api_here
+VITE_WEATHER_API_KEY= give-openweathermap-api key
 
 ```
 
@@ -83,7 +85,7 @@ npm run dev
 
 ---
 
-## 🌟 Roadmap & Stretch Goals
+## 🌟 Future Goals and Enhancements
 
 * [ ] **Local Storage:** Save recent searches to allow users to quickly toggle between cities.
 * [ ] **7-Day Forecast:** Extend API calls to include daily high/low projections.
@@ -96,6 +98,6 @@ npm run dev
 
 **Author:** Emmanuel Osei-Mensah
 
-**Challenge:** My ALX Front-End Capstone Project
+**Challenge:** My ALX Front-End Capstone Project 2026
 
 ---
