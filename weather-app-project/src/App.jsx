@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import ErrorMessage from "./components/ErrorMessage";
 import SearchBar from "./components/SearchBar";
 import WeatherCard from "./components/WeatherCard";
@@ -8,81 +9,61 @@ import useWeather from "./hooks/useWeather";
 import Weatherlogo from "./assets/weather-icon.webp";
 
 function App() {
-  const [city, setCity] = useState("");
-  const [forecast, setForecast] = useState([]);
-  const [isForecastLoading, setIsForecastLoading] = useState(false);
+  const [searchInput, setSearchInput] = useState("Kumasi");
+  const [activeCity, setActiveCity] = useState("Kumasi");
 
-  // Use our custom hook for current weather
-  const { weather, loading, error, refresh } = useWeather(city);
+  // Hook returns both weather AND forecast
+  const { weather, forecast, loading, error } = useWeather(activeCity);
 
-  const fetchForecast = useCallback(async (searchCity) => {
-    if (!searchCity) return;
-
-    try {
-      setIsForecastLoading(true);
-      const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-      const forecast_url = `https://api.openweathermap.org/data/2.5/forecast?q=${searchCity}&appid=${API_KEY}&units=metric`;
-
-      const res = await fetch(forecast_url);
-      if (!res.ok) throw new Error("Forecast data unavailable");
-
-      const data = await res.json();
-
-      // Logic check: Filter for midday (12:00) to get one reading per day
-      const midday_forecast = data.list
-        .filter((item) => item.dt_txt.includes("12:00:00"))
-        .slice(0, 5);
-
-      setForecast(midday_forecast);
-    } catch (err) {
-      console.error("Forecast Error:", err.message);
-      setForecast([]); // Clear forecast on error
-    } finally {
-      setIsForecastLoading(false);
-    }
-  }, []);
-
-  // Wrapper function to trigger both fetches at once
   const handleSearch = () => {
-    if (!city.trim()) return;
-    refresh(); // From useWeather hook
-    fetchForecast(city);
+    const trimmed = searchInput.trim();
+    if (trimmed) setActiveCity(trimmed);
   };
 
   return (
     <DynamicBackground weather={weather}>
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 m-4">
-        <header className="flex items-center justify-center mb-6">
-          <img
-            src={Weatherlogo}
-            alt="weather-logo"
-            className="w-12 h-12 mr-3"
-          />
-          <h1 className="text-2xl font-extrabold text-gray-800 tracking-tight">
-            Weather Dashboard
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-4xl 
+                      bg-white/90 backdrop-blur-xl rounded-[2.5rem] shadow-2xl 
+                      p-6 sm:p-10 m-4 border border-white/20">
+        
+        <header className="flex flex-col sm:flex-row items-center justify-center mb-8 gap-4">
+          <img src={Weatherlogo} alt="logo" className="w-10 h-10" />
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-800 tracking-tight">
+            SkyCast <span className="text-blue-500">Weather</span>
           </h1>
         </header>
 
-        <SearchBar city={city} setCity={setCity} onSearch={handleSearch} />
+        <SearchBar 
+          city={searchInput} 
+          setCity={setSearchInput} 
+          onSearch={handleSearch} 
+        />
 
-        {/* Loading Indicator */}
-        {(loading || isForecastLoading) && (
-          <div className="flex justify-center items-center mt-6">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <p className="ml-3 text-sm text-gray-500">Updating weather...</p>
-          </div>
-        )}
-
-        {/* Conditional Rendering */}
-        {!loading && (
-          <>
+        <main className="mt-8 min-h-100">
+          {loading ? (
+            <div className="flex flex-col justify-center items-center py-24">
+              <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
+              <p className="mt-4 font-bold text-gray-400 animate-pulse uppercase tracking-widest text-xs">
+                Syncing Forecast...
+              </p>
+            </div>
+          ) : error ? (
             <ErrorMessage message={error} />
-            <WeatherCard weather={weather} />
-            <FiveDaysForecast 
-            forecast={forecast} 
-             cityName={weather?.name || "Unknown City"}/>
-          </>
-        )}
+          ) : (
+            <div className="space-y-12 animate-in fade-in zoom-in duration-500">
+              <WeatherCard weather={weather} />
+              
+              {forecast.length > 0 && (
+                <div className="pt-10 border-t border-gray-100/50">
+                  <FiveDaysForecast 
+                    forecast={forecast} 
+                    cityName={weather?.name || activeCity} 
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </main>
       </div>
     </DynamicBackground>
   );

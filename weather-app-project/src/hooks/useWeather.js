@@ -1,37 +1,52 @@
+// hooks/useWeather.js
 import { useEffect, useState, useCallback } from "react";
 
-const REFRESH_INTERVAL = 2 * 60 * 1000; // Increase to 5  mins later (standard for weather)
+const REFRESH_INTERVAL = 2 * 60 * 1000; // reverse to 5 minutes after illustration
 
 export default function useWeather(city) {
   const [weather, setWeather] = useState(null);
+  const [forecast, setForecast] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
-  const fetchWeather = useCallback(async (signal) => {
-    if (!city) return;
-    if (!API_KEY) {
-      setError("API Key missing from environment variables.");
-      return;
-    }
+  const fetchData = useCallback(async (signal) => {
+    if (!city || !API_KEY) return;
 
     try {
       setLoading(true);
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`,
-        { signal } // Pass the signal here
-      );
+      
+      // Fetch both Current and Forecast simultaneously using Promise.all
+      const [weatherRes, forecastRes] = await Promise.all([
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`, { signal }),
+        fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric`, { signal })
+      ]);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch");
+      if (!weatherRes.ok || !forecastRes.ok) throw new Error("Location not found or data unavailable");
 
-      setWeather(data);
+      const weatherData = await weatherRes.json();
+      const forecastData = await forecastRes.json();
+
+      // Filter Forecast logic
+      const uniqueDays = [];
+      const seenDates = new Set();
+      forecastData.list.forEach((item) => {
+        const date = item.dt_txt.split(" ")[0];
+        if (!seenDates.has(date) && uniqueDays.length < 5) {
+          seenDates.add(date);
+          uniqueDays.push(item);
+        }
+      });
+
+      setWeather(weatherData);
+      setForecast(uniqueDays);
       setError(null);
     } catch (err) {
       if (err.name !== 'AbortError') {
         setError(err.message);
         setWeather(null);
+        setForecast([]);
       }
     } finally {
       setLoading(false);
@@ -40,16 +55,15 @@ export default function useWeather(city) {
 
   useEffect(() => {
     const controller = new AbortController();
-    
-    fetchWeather(controller.signal);
+    fetchData(controller.signal);
 
-    const interval = setInterval(() => fetchWeather(controller.signal), REFRESH_INTERVAL);
+    const interval = setInterval(() => fetchData(controller.signal), REFRESH_INTERVAL);
 
     return () => {
-      controller.abort(); // Cancel request if component unmounts
+      controller.abort();
       clearInterval(interval);
     };
-  }, [fetchWeather]);
+  }, [fetchData]);
 
-  return { weather, loading, error, refresh: () => fetchWeather() };
+  return { weather, forecast, loading, error };
 }
